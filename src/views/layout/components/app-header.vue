@@ -42,7 +42,8 @@ export default {
       height: 132px;
       width: 100%;
       text-indent: -9999px;
-      background: url(~@/assets/images/logo.png) no-repeat center 18px / contain;
+      background: url(~@/assets/images/logo.jpg) no-repeat center 18px;
+      background-size: 100px 100px;
     }
   }
   .search {

@@ -1,11 +1,15 @@
 <template>
   <ul class="app-header-nav">
     <li class="home"><RouterLink to="/">首页</RouterLink></li>
-    <li v-for="item in navList" :key="item.id">
+    <li v-for="item in navList" :key="item.id"
+    :class="{open: item.open}"
+    @mouseenter="store.commit('category/show', item.id)"
+    @mouseleave="store.commit('category/hide', item.id)"
+    @click="store.commit('category/hide', item.id)">
       <a href="#">{{item.name}}</a>
       <div class="layer">
         <ul>
-          <li v-for="sub in item.children" :key="sub.id">
+          <li v-for="sub in item.children" :key="sub.id" @click="store.commit('category/hide', item.id)">
             <a href="#">
               <img
                 :src="sub.picture"
@@ -53,10 +57,13 @@ const navList = computed(() => {
         color: @xtxColor;
         border-bottom: 1px solid @xtxColor;
       }
-      > .layer {
-        height: 132px;
-        opacity: 1;
-      }
+    }
+  }
+
+  .open {
+    .layer {
+      height: 132px;
+      opacity: 1;
     }
   }
 }
