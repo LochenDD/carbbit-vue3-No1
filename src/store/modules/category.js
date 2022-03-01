@@ -1,12 +1,22 @@
 import { getCategroyList } from '@/api/category'
-import { topCategory } from '@/api/constants'
+import { topCategory } from '@/constants'
 
 export default {
   namespaced: true,
   state: {
-    categoryList: topCategory.map(cur => ({ name: cur }))
+    categoryList: topCategory.map(cur => ({ name: cur })),
+    currentSubCategory: {},
+    currentCategory: {}
   },
   mutations: {
+    setCurrentSubCategory (state, payload) {
+      const { category, sub } = payload
+      state.currentSubCategory = sub
+      this.commit('category/setCurrentCategory', category)
+    },
+    setCurrentCategory (state, payload) {
+      state.currentCategory = payload
+    },
     setCategoryList (state, newList) {
       state.categoryList = newList
     },
@@ -22,7 +32,6 @@ export default {
   actions: {
     async asyncSetCategoryList ({ commit }) {
       const res = await getCategroyList()
-      console.log('res: ', res)
       res.result.forEach(cur => {
         cur.open = false
       })

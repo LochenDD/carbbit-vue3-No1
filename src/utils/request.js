@@ -1,4 +1,6 @@
 import axios from 'axios'
+import message from '@/components/message'
+import { ignoreMessage } from '@/constants'
 
 const instance = axios.create({
   baseURL: 'http://pcapi-xiaotuxian-front.itheima.net',
@@ -19,8 +21,9 @@ instance.interceptors.response.use(function (response) {
   // 对响应数据做点什么
   return response.data
 }, function (error) {
+  if (ignoreMessage.findIndex(i => i === error.response?.data.message) === -1) message('error', error.response?.data.message)
   // 对响应错误做点什么
-  return Promise.reject(error)
+  return Promise.reject(error.response.data)
 })
 
 export default instance

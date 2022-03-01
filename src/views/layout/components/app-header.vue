@@ -1,10 +1,10 @@
 <template>
   <header class='app-header'>
     <div class="container">
-      <h1 class="logo"><RouterLink to="/">小兔鲜</RouterLink></h1>
-      <suspense>
+      <h1 class="logo"><RouterLink to="/">ddd</RouterLink></h1>
+      <Suspense>
         <AppHeaderNav></AppHeaderNav>
-      </suspense>
+      </Suspense>
       <div class="search">
         <i class="iconfont icon-search"></i>
         <input type="text" placeholder="搜一搜">
@@ -20,6 +20,7 @@
 
 <script setup>
 import AppHeaderNav from './app-header-nav'
+
 </script>
 
 <script>

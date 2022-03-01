@@ -10,3 +10,8 @@ export const topCategory = [
   '运动',
   '杂项'
 ]
+
+// 不提示的错误信息
+export const ignoreMessage = [
+  '三方登录失败'
+]

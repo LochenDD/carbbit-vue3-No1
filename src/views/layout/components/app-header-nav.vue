@@ -6,17 +6,19 @@
     @mouseenter="store.commit('category/show', item.id)"
     @mouseleave="store.commit('category/hide', item.id)"
     @click="store.commit('category/hide', item.id)">
-      <a href="#">{{item.name}}</a>
+      <RouterLink :to="`/category/${item.id}`" @click="store.commit('category/setCurrentCategory', item)">
+        {{item.name}}
+      </RouterLink>
       <div class="layer">
         <ul>
           <li v-for="sub in item.children" :key="sub.id" @click="store.commit('category/hide', item.id)">
-            <a href="#">
+            <RouterLink :to="`/category/sub/${sub.id}`" @click="$store.commit('category/setCurrentSubCategory', {category: item, sub})">
               <img
                 :src="sub.picture"
                 alt=""
               />
               <p>{{ sub.name }}</p>
-            </a>
+            </RouterLink>
           </li>
         </ul>
       </div>
@@ -28,7 +30,7 @@
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 const store = useStore()
-store.dispatch('category/asyncSetCategoryList')
+// store.dispatch('category/asyncSetCategoryList')
 const navList = computed(() => {
   return store.state.category.categoryList
 })
