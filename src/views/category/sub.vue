@@ -14,7 +14,13 @@
       <SubFilter :filterData="filterData"></SubFilter>
 
       <div class="goods-list">
-        <SubSort />
+        <SubSort @sortChange="sortChange"/>
+        <ul>
+          <li v-for="good in goodsList" :key="good.id">
+            <GoodsItem :detail="good" />
+          </li>
+        </ul>
+        <XtxInfiniteLoading ref="infinite" v-model:loading="loading" :finished="finished" @load="onLoad"></XtxInfiniteLoading>
       </div>
     </div>
   </div>
@@ -25,25 +31,51 @@ import { useRoute } from 'vue-router'
 import SubFilter from './components/sub-filter.vue'
 import { useStore } from 'vuex'
 import { defineComponent, computed, ref, reactive, provide, watch } from 'vue'
-import { findSubCategoryFilter } from '@/api/category'
+import { findSubCategoryFilter, findSubCategoryGoods } from '@/api/category'
 import SubSort from './components/sub-sort.vue'
+import GoodsItem from './components/goods-item.vue'
 
 export default defineComponent({
   name: 'Sub',
   components: {
     SubFilter,
-    SubSort
+    SubSort,
+    GoodsItem
   },
   setup () {
-    const query = reactive({
+    const route = useRoute()
+    const store = useStore()
+
+    const loading = ref(false)
+    const finished = ref(false)
+    const goodsList = ref([])
+    const infinite = ref(null)
+
+    let query = reactive({
       attrs: [],
       brandId: '-1',
-      categoryId: '',
+      categoryId: route.params.id,
       page: 1,
       pageSize: 20
     })
 
+    const onLoad = () => {
+      if (finished.value) return
+      findSubCategoryGoods(query).then(({ result }) => {
+        if (result.items.length === 0) {
+          finished.value = true
+          loading.value = false
+          infinite.value.stop()
+          return
+        }
+        query.page++
+        loading.value = false
+        goodsList.value = [...goodsList.value, ...result.items]
+      })
+    }
+
     const setQuery = ({ key, value }) => {
+      console.log('🚀 ~ file: sub.vue ~ line 93 ~ key, value', key, value)
       if (key === 'attrs') {
         const { groupName, propertyName } = value
         const item = query.attrs.find(cur => cur.groupName === groupName)
@@ -58,13 +90,11 @@ export default defineComponent({
       } else {
         query[key] = value
       }
+      console.log('🚀 ~ file: sub.vue ~ line 160 ~ query', query)
     }
 
     provide('setQuery', setQuery)
     provide('query', query)
-
-    const route = useRoute()
-    const store = useStore()
 
     const currentSubCategory = computed(() => {
       return store.state.category.currentSubCategory
@@ -84,6 +114,7 @@ export default defineComponent({
 
     watch(() => currentSubCategory.value.id, () => {
       if (!route.path.includes('sub')) return
+      // 二级菜单修改后重新请求筛选项数据
       findSubCategoryFilter(currentSubCategory.value.id).then(({ result }) => {
         result.saleProperties.forEach((cur) => cur.properties.unshift({ id: -1, name: '全部' }))
         result.brands.unshift({ id: -1, name: '全部' })
@@ -95,15 +126,34 @@ export default defineComponent({
           })
           return pre
         }, [])
+
+        // 二级菜单修改后重新请求商品数据
+        query.page = 1
+        finished.value = false
+        onLoad()
       })
     }, {
       immediate: true
     })
 
+    const sortChange = (sortParams) => {
+      query = reactive({ ...query, ...sortParams })
+      query.page = 1
+      finished.value = false
+      goodsList.value = []
+      onLoad()
+    }
+
     return {
       currentSubCategory,
       currentCategory,
-      filterData
+      filterData,
+      onLoad,
+      loading,
+      finished,
+      goodsList,
+      infinite,
+      sortChange
     }
   }
 })
@@ -124,6 +174,11 @@ export default defineComponent({
     background: #fff;
     padding: 0 25px;
     margin-top: 25px;
+
+    ul {
+      display: flex;
+      flex-wrap: wrap;
+    }
   }
 }
 </style>

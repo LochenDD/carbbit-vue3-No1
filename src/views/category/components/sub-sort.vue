@@ -14,7 +14,6 @@
     <div class="check">
       <XtxCheckbox v-model="inventory">仅显示有货商品</XtxCheckbox>
       <XtxCheckbox v-model="onlyDiscount">仅显示特惠商品</XtxCheckbox>
-      <XtxInfiniteLoading v-model:loading="loading" :finished="finished"></XtxInfiniteLoading>
     </div>
   </div>
 </template>
@@ -22,7 +21,7 @@
 import { reactive, toRefs } from 'vue'
 export default {
   name: 'SubSort',
-  setup () {
+  setup (props, { emit }) {
     const infiniteStatus = reactive({
       loading: false,
       finished: false
@@ -50,9 +49,10 @@ export default {
         } else if (searchParams.sortMethod === 'asc') {
           searchParams.sortMethod = 'desc'
         } else {
-          searchParams.sortMethod = null
+          searchParams.sortMethod = 'asc'
         }
       }
+      emit('sortChange', searchParams)
     }
 
     return {

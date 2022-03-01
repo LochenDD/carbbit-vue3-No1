@@ -29,7 +29,7 @@ export default {
   },
   setup (props, { emit }) {
     const target = ref(null)
-    useIntersectionObserver(target, ([{ isIntersecting }]) => {
+    const { stop } = useIntersectionObserver(target, ([{ isIntersecting }]) => {
       if (isIntersecting) {
         emit('load')
         emit('update:loading', true)
@@ -39,7 +39,8 @@ export default {
     })
 
     return {
-      target
+      target,
+      stop
     }
   }
 }
